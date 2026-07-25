@@ -1,0 +1,9 @@
+numpy
+torch
+scikit-learn
+kagglehub
+Pillow
+pandas
+fastapi
+python-multipart
+uvicorn
