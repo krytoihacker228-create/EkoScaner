@@ -14,5 +14,5 @@ pip install -r requirements.txt
 
 ## Запуск
 Запустить файл app.py в папке Eco
-написать команду python -m uvicorn app:app --reload в командной строке
+Написать команду python -m uvicorn app:app --reload в командной строке
 Запустить файл ЭКО сканер BETA 2 API
