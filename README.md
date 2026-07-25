@@ -6,8 +6,11 @@
 
 В программе была использована свёрточная нейросеть SimpleNN.
 
-## Датабаза
-Для создания использовалась датабаза "Garbage Image Test" по ссылке https://www.kaggle.com/datasets/farzadnekouei/trash-type-image-dataset
+## Датасет
+Для создания использовалась датасет "Garbage Image Test" по ссылке https://www.kaggle.com/datasets/farzadnekouei/trash-type-image-dataset
 
 ## Установка необходимых зависимостей
 pip install -r requirements.txt
+
+## Запуск
+написать команду python -m uvicorn app:app --reload в командной строке, после чего запустить файл ЭКО сканер BETA 2 API
