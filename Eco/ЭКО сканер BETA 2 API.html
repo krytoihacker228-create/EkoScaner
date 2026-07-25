@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ЭКО сканер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #eaf7e1 0%, #c8e6c9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 48px;
+            box-shadow: 0 20px 60px rgba(0, 40, 0, 0.15);
+            padding: 40px 35px;
+            max-width: 600px;
+            width: 100%;
+            transition: 0.3s;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+        h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #1e3a2f;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        h1 span {
+            background: #2e7d32;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 60px;
+            letter-spacing: 0.3px;
+        }
+        .subhead {
+            color: #3b5e4b;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            border-left: 4px solid #4caf50;
+            padding-left: 16px;
+            background: rgba(76, 175, 80, 0.06);
+            border-radius: 0 12px 12px 0;
+        }
+        .upload-area {
+            border: 2px dashed #81c784;
+            border-radius: 28px;
+            padding: 30px 20px;
+            text-align: center;
+            background: #f1f9f0;
+            transition: 0.25s;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+        .upload-area:hover {
+            background: #e8f5e9;
+            border-color: #388e3c;
+        }
+        .upload-area.dragover {
+            background: #c8e6c9;
+            border-color: #1b5e20;
+        }
+        .upload-icon {
+            font-size: 3.6rem;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .upload-text {
+            font-size: 1.1rem;
+            color: #2e5a3a;
+            font-weight: 500;
+        }
+        .upload-hint {
+            font-size: 0.85rem;
+            color: #558b5e;
+            margin-top: 4px;
+        }
+        #fileInput {
+            display: none;
+        }
+        .preview-wrapper {
+            display: none;
+            margin: 16px 0 20px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 30, 0, 0.08);
+            background: #fff;
+            border: 1px solid #a5d6a7;
+        }
+        .preview-wrapper img {
+            display: block;
+            width: 100%;
+            max-height: 350px;
+            object-fit: contain;
+            background: #fafffe;
+            padding: 8px;
+        }
+        .preview-wrapper.active {
+            display: block;
+        }
+        .btn-analyze {
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 16px 28px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 18px rgba(46, 125, 50, 0.25);
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .btn-analyze:hover {
+            background: #1b5e20;
+            transform: scale(1.01);
+            box-shadow: 0 10px 24px rgba(27, 94, 32, 0.35);
+        }
+        .btn-analyze:active {
+            transform: scale(0.97);
+        }
+        .btn-analyze:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result-box {
+            margin-top: 28px;
+            padding: 20px 24px;
+            border-radius: 28px;
+            background: #e8f5e9;
+            border: 1px solid #81c784;
+            display: none;
+            transition: 0.3s;
+        }
+        .result-box.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
+        .result-box .label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #2e7d32;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .result-box .type {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1b3b1f;
+            line-height: 1.2;
+        }
+        .result-box .badge {
+            display: inline-block;
+            background: #2e7d32;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 14px;
+            border-radius: 40px;
+            margin-top: 6px;
+            letter-spacing: 0.3px;
+        }
+        .result-box .description {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #234b2a;
+            border-top: 1px solid #a5d6a7;
+            padding-top: 12px;
+        }
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(12px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 480px) {
+            .container { padding: 24px 18px; }
+            h1 { font-size: 2rem; }
+            .upload-text { font-size: 1rem; }
+            .result-box .type { font-size: 1.6rem; }
+        }
+        
+        /* Счётчик загрузок */
+        .counter {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #3b5e4b;
+            background: rgba(76, 175, 80, 0.1);
+            padding: 8px 16px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+        .counter-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>♻️ ЭКО сканер <span>beta</span></h1>
+    <div class="subhead">Загрузите фото мусора — мы определим его тип</div>
+    
+    <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📸</div>
+        <div class="upload-text">Нажмите или перетащите фото</div>
+        <div class="upload-hint">Поддерживаются JPG, PNG, WEBP</div>
+        <input type="file" id="fileInput" accept="image/*" />
+    </div>
+    
+    <div class="preview-wrapper" id="previewWrapper">
+        <img id="previewImage" src="#" alt="Превью загруженного фото" />
+    </div>
+    
+    <button class="btn-analyze" id="analyzeBtn" disabled>🔍 Распознать</button>
+    
+    <div class="counter-wrapper">
+        <div class="counter" id="counterDisplay">📸 Загружено фото: 0</div>
+    </div>
+    
+    <div class="result-box" id="resultBox">
+        <div class="label">📋 Результат сканирования</div>
+        <div class="type" id="resultType">Пластик</div>
+        <span class="badge" id="resultBadge">♻️ перерабатывается</span>
+        <div class="description" id="resultDesc">
+            На фото изображён <strong>пластиковый мусор</strong>.
+            Пластик можно сдать в специальные контейнеры для вторичной переработки.
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // DOM-элементы
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewWrapper = document.getElementById('previewWrapper');
+        const previewImage = document.getElementById('previewImage');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const resultBox = document.getElementById('resultBox');
+        const resultType = document.getElementById('resultType');
+        const resultBadge = document.getElementById('resultBadge');
+        const resultDesc = document.getElementById('resultDesc');
+        const counterDisplay = document.getElementById('counterDisplay');
+
+        // Счётчик загрузок
+        let uploadCounter = 0;
+        let currentFile = null;
+
+        // Данные для разных типов мусора (по порядку)
+        const wasteTypes = [
+            {
+                type: 'Пластик',
+                badge: '♻️ перерабатывается',
+                description: 'На фото изображён <strong>пластиковый мусор</strong>. Пластик можно сдать в специальные контейнеры для вторичной переработки.'
+            },
+            {
+                type: 'Картон',
+                badge: '📦 подлежит переработке',
+                description: 'На фото изображён <strong>картонный мусор</strong>. Картон можно сдать в пункты приёма макулатуры или в специальные контейнеры для бумаги.'
+            }
+        ];
+
+        // Функция получения типа мусора по счётчику
+        function getWasteTypeByCounter(counter) {
+            // Если счётчик нечётный (1, 3, 5...) — Пластик
+            // Если чётный (2, 4, 6...) — Картон
+            const index = (counter - 1) % 2; // 0 для нечётных, 1 для чётных
+            return wasteTypes[index];
+        }
+
+        // Функция отображения результата
+        function showResult(wasteData) {
+            resultType.textContent = wasteData.type;
+            resultBadge.textContent = wasteData.badge;
+            resultDesc.innerHTML = wasteData.description;
+            resultBox.classList.add('active');
+        }
+
+        // Обработка загруженного файла
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                alert('Пожалуйста, выберите изображение.');
+                return;
+            }
+
+            currentFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewWrapper.classList.add('active');
+                analyzeBtn.disabled = false;
+                resultBox.classList.remove('active'); // скрываем старый результат
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Событие клика по области загрузки
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Событие выбора файла
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files.length > 0) {
+                handleFile(fileInput.files[0]);
+            }
+        });
+
+        // Drag & Drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+                // Синхронизируем input
+                const dt = new DataTransfer();
+                dt.items.add(files[0]);
+                fileInput.files = dt.files;
+            }
+        });
+
+        // Кнопка "Распознать"
+        analyzeBtn.addEventListener('click', () => {
+            if (!currentFile) {
+                alert('Сначала загрузите фото.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            fetch('http://127.0.0.1:8000/predict',{method:'POST',body:formData}).then(r=>r.json()).then(data=>{
+            if(data.error){alert(data.error);return;}
+            showResult(data);
+            analyzeBtn.disabled=true;previewWrapper.classList.remove('active');currentFile=null;fileInput.value='';
+            }).catch(e=>alert('Ошибка подключения к API: '+e));
+            return;
+
+            // Увеличиваем счётчик
+            uploadCounter++;
+            counterDisplay.textContent = `📸 Загружено фото: ${uploadCounter}`;
+
+            // Получаем тип мусора для текущего счётчика
+            const wasteData = getWasteTypeByCounter(uploadCounter);
+            
+            // Показываем результат
+            showResult(wasteData);
+
+            // Блокируем кнопку до новой загрузки
+            analyzeBtn.disabled = true;
+            previewWrapper.classList.remove('active');
+            currentFile = null;
+            fileInput.value = ''; // очищаем input
+        });
+
+        // Инициализация
+        counterDisplay.textContent = '📸 Загружено фото: 0';
+    })();
+</script>
+</body>
+</html>
