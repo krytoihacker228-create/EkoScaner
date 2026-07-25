@@ -13,7 +13,9 @@
 pip install -r requirements.txt
 
 ## Запуск
-Запустить файл app.py в папке Eco
+Запустить файл app.py в папке Eco (в VS code обязательно открывать папку Eco, и только в ней запускать файл, не по отдельности!)
+
+Установить зависимости с помощью pip install -r requirements.txt
 
 Написать команду python -m uvicorn app:app --reload в командной строке
 
