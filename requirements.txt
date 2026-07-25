@@ -6,3 +6,4 @@ Pillow
 pandas
 fastapi
 python-multipart
+uvicorn
